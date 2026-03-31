@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Square({ value, onClickSquare, someNewProp }) {
+function Square({ value, onClickSquare }) {
 
   function anyOtherFunctionName() {
     console.log("mouse on");
@@ -86,33 +86,36 @@ export function Board({ isXNext, squares, onPlay }) {
 
 export default function Game() {
 
-  const [isXNext, setIsXNext] = useState(true);
   const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [currentMove, setCurrentMove] = useState(0);
+  const isXNext = currentMove % 2 === 0;
 
-  const currentSquares = history[history.length - 1]
+  const currentSquares = history[currentMove]
 
   function handlePlay(nextSquares) {
-    setHistory([...history, nextSquares])
-    setIsXNext(!isXNext)
+    const nextHistory = ([...history.slice(0, currentMove + 1), nextSquares]);
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
   }
 
   // list (array like object) steps = []
   // steps.map((step) => <li>step 1</li>)
 
   function jumpTo(nextMove) {
-    // TODO
+    setCurrentMove(nextMove);
   }
 
-  const moves = history.map((squares, move) => {
+
+  const moves = history.map((squares, i) => {
     let description;
-    if (move > 0) {
-      description = 'Go to move #' + move;
+    if (i > 0) {
+      description = 'Go to move #' + i;
     } else {
       description = 'Go to game start';
     }
     return (
-      <li key={move}>
-      <button onClick={() => jumpTo(move)}>{description}</button>
+      <li key={i}>
+      <button onClick={() => jumpTo(i)}>{description}</button>
     </li>
     );
   });
@@ -124,7 +127,7 @@ export default function Game() {
       </div>
       <div className="game-info">
         
-        <ol>{moves}</ol>
+        <ul>{moves}</ul>
       </div>
     </div>
   );
